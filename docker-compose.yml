@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  app:
+    build: ./src
+    env_file:
+      - ./.env.dev
+    volumes:
+      - ./src/:/app/
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+
+    command: python manage.py run -h 0.0.0.0
+
+  db:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=flask_postgres_dev
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+
+volumes:
+  pg_data:
