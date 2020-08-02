@@ -316,7 +316,7 @@ paths:
       tags:
         - users
     put:
-      summary: ''
+      summary: Update User
       operationId: put-users-user_id
       responses:
         '200':
