@@ -13,7 +13,7 @@ from .decorators import error_handler
 from .logs import get_logger
 from .models import Message, User
 from .schemas import MessageSchema, UserSchema
-from .views_functions import generic_delete_method
+from .views_functions import generic_delete_method, generic_get_detail_method
 
 logger = get_logger(__name__)
 app = Flask(__name__)
@@ -60,17 +60,7 @@ def users():
 @error_handler
 def users_detail(user_id):
     if request.method == "GET":
-        logger.info("users.request: %s", request)
-        logger.info("users.user_id: %s", user_id)
-        user_db = session.query(User).get(user_id)
-        if not user_db:
-            response = {"message": "User not found"}
-            return jsonify(response), HTTPStatus.NOT_FOUND.value
-
-        response = UserSchema().dump(user_db)
-        logger.info("users.response: %s", response)
-
-        return jsonify(response), HTTPStatus.OK.value
+        return generic_get_detail_method(user_id, User, request, UserSchema)
 
     elif request.method == "PUT":
         logger.info("users.request: %s", request)
@@ -144,17 +134,7 @@ def messages():
 @error_handler
 def messages_detail(message_id):
     if request.method == "GET":
-        logger.info("messages.request: %s", request)
-        logger.info("messages.message_id: %s", message_id)
-        message_db = session.query(Message).get(message_id)
-        if not message_db:
-            response = {"message": "Message not found"}
-            return jsonify(response), HTTPStatus.NOT_FOUND.value
-
-        response = MessageSchema().dump(message_db)
-        logger.info("messages.response: %s", response)
-
-        return jsonify(response), HTTPStatus.OK.value
+        return generic_get_detail_method(message_id, Message, request, MessageSchema)
 
     elif request.method == "DELETE":
         return generic_delete_method(message_id, Message, request)
