@@ -24,3 +24,7 @@ docker_run:
 
 run_tests:
 	. venv/bin/activate && cd src/ && pytest -s
+
+docker_build_n_run:
+	docker-compose up -d --build
+	docker-compose up
