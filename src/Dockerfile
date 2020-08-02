@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y netcat
 
 RUN pip install --upgrade pip
 COPY ./requirements/ /app/requirements/
-RUN pip install -r requirements/base.txt
+RUN pip install -r requirements/dev.txt
 
 COPY . /app/
 ENTRYPOINT ["/app/entrypoint.sh"]
