@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from marshmallow import ValidationError
 
+from app.constants import STATUS_MAP
 from app.schemas import MessageSchema, UserSchema
 
 
@@ -63,6 +64,17 @@ def test_message_load_auto_fill_created_with_utc_and_microsecond_zero():
     }
 
     assert result == expected_result
+
+
+def test_message_auto_fill_status_field():
+    data = {
+        "scheduled": "2030-08-2T16:12:12Z",
+        "text": "oijwqoid",
+        "kind": "email",
+        "user_id": 1,
+    }
+    result = MessageSchema().load(data)
+    assert result["status"] == STATUS_MAP["scheduled"]
 
 
 @pytest.mark.parametrize(
