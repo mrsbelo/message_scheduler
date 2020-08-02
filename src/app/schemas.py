@@ -1,16 +1,13 @@
-from marshmallow import EXCLUDE, Schema
-from marshmallow.fields import Email, Integer, String
+from datetime import datetime
+
+from marshmallow import EXCLUDE, Schema, ValidationError, post_load, pre_dump, validates
+from marshmallow.fields import DateTime, Email, Integer, String
+from marshmallow.validate import OneOf
+
+from .constants import DATETIME_FORMAT, KIND_MAP, STATUS_MAP
 
 
-class BaseSchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__}>"
-
-
-class UserSchema(BaseSchema):
+class UserSchema(Schema):
     class Meta:
         unknown = EXCLUDE
         include = {"id": Integer(dump_only=True)}
@@ -18,3 +15,39 @@ class UserSchema(BaseSchema):
     name = String(required=True)
     email = Email()
     phone = String()
+
+
+class MessageSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    created = DateTime(DATETIME_FORMAT, dump_only=True)
+    scheduled = DateTime(DATETIME_FORMAT, required=True)
+    text = String(required=True)
+    kind = String(required=True, validate=[OneOf(["email", "sms", "push", "whatsapp"])])
+    status = String(validate=OneOf(["scheduled", "sended"]))
+    user_id = Integer(required=True)
+
+    @validates("scheduled")
+    def cannot_schedule_into_past(self, scheduled, **kwargs):
+        if datetime.utcnow() >= scheduled:
+            raise ValidationError(
+                message="Cannot scheduled messages into the past", field="scheduled"
+            )
+
+        return scheduled
+
+    @post_load
+    @pre_dump
+    def mapping_kind_and_status_str_to_int(self, data, **kwargs):
+        if data.get("status"):
+            data["status"] = STATUS_MAP[data["status"]]
+        data["kind"] = KIND_MAP[data["kind"]]
+        return data
+
+    @post_load
+    def insert_created_field(self, data, **kwargs):
+        if not data.get("created"):
+            data["created"] = datetime.utcnow().replace(microsecond=0)
+
+        return data
