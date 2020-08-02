@@ -80,7 +80,7 @@ def messages():
         return jsonify(response), HTTPStatus.CREATED.value
 
 
-@app.route("/message/<int:message_id>", methods=["GET"])
+@app.route("/messages/<int:message_id>", methods=["GET", "DELETE"])
 @error_handler
 def message_detail(message_id):
     if request.method == "GET":
@@ -95,3 +95,38 @@ def message_detail(message_id):
         logger.info("messages.response: %s", response)
 
         return jsonify(response), HTTPStatus.OK.value
+
+    elif request.method == "DELETE":
+        logger.info("messages.request: %s", request)
+        logger.info("messages.message_id: %s", message_id)
+        message_db = session.query(Message).get(message_id)
+        if not message_db:
+            response = {"message": "Message not found"}
+            return jsonify(response), HTTPStatus.NOT_FOUND.value
+
+        session.delete(message_db)
+        session.commit()
+        logger.info("message.deleted")
+
+        return jsonify({}), HTTPStatus.NO_CONTENT.value
+
+
+@app.route("/", defaults={"path": ""})
+@app.route(
+    "/<path:path>",
+    methods=[
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "DELETE",
+        "CONNECT",
+        "OPTIONS",
+        "TRACE",
+        "PATCH",
+    ],
+)
+@error_handler
+def page_not_found(path):
+    """Capture everything and throws 404 Page not found"""
+    return jsonify({"message": "Page not found"}), HTTPStatus.NOT_FOUND.value

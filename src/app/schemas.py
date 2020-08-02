@@ -30,6 +30,7 @@ class UserSchema(Schema):
 class MessageSchema(Schema):
     class Meta:
         unknown = EXCLUDE
+        include = {"id": Integer(dump_only=True)}
 
     created = DateTime(DATETIME_FORMAT, dump_only=True)
     scheduled = DateTime(DATETIME_FORMAT, required=True)
