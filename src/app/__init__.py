@@ -1,8 +1,13 @@
 from http import HTTPStatus
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
-from .clients import check_if_message_exists, is_user_ok_to_recieve_this_kind
+from .clients import (
+    check_if_message_exists,
+    get_user_by_id,
+    is_user_ok_to_recieve_this_kind,
+)
 from .db import session
 from .decorators import error_handler
 from .logs import get_logger
@@ -11,6 +16,7 @@ from .schemas import MessageSchema, UserSchema
 
 logger = get_logger(__name__)
 app = Flask(__name__)
+CORS(app)
 app.config.from_object("app.config.Config")
 
 
@@ -121,7 +127,13 @@ def messages():
 
             return jsonify(response), HTTPStatus.OK.value
 
-        if not is_user_ok_to_recieve_this_kind(validated_request):
+        user_db = get_user_by_id(validated_request["user_id"])
+        if not user_db:
+            response = {"message": "user_id not found"}
+
+            return jsonify(response), HTTPStatus.BAD_REQUEST.value
+
+        if not is_user_ok_to_recieve_this_kind(user_db, validated_request):
             response = {
                 "message": "User cant recieve this message, user register is incomplete"
             }

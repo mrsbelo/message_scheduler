@@ -19,9 +19,11 @@ def check_if_message_exists(data):
     )
 
 
-def is_user_ok_to_recieve_this_kind(data):
-    user_db = session.query(User).get(data["user_id"])
+def get_user_by_id(user_id):
+    return session.query(User).get(user_id)
 
+
+def is_user_ok_to_recieve_this_kind(user_db, data):
     if data["kind"] in [KIND_MAP["email"], KIND_MAP["push"]]:
         if not user_db.email:
             return False

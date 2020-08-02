@@ -2,7 +2,11 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from app.clients import check_if_message_exists, is_user_ok_to_recieve_this_kind
+from app.clients import (
+    check_if_message_exists,
+    get_user_by_id,
+    is_user_ok_to_recieve_this_kind,
+)
 from app.constants import KIND_MAP
 from app.models import Message, User
 
@@ -83,7 +87,7 @@ def test_is_user_ok_to_recieve_this_kind_user_missing_email(
     user_db = save_instance(User, {"name": "marco", "phone": "1234567"})
     data = {"kind": KIND_MAP[kind], "user_id": user_db.id}
 
-    assert is_user_ok_to_recieve_this_kind(data) == expected_result
+    assert is_user_ok_to_recieve_this_kind(user_db, data) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -97,4 +101,13 @@ def test_is_user_ok_to_recieve_this_kind_user_missing_phone(
     user_db = save_instance(User, {"name": "marco", "email": "asd@asd.com",})
     data = {"kind": KIND_MAP[kind], "user_id": user_db.id}
 
-    assert is_user_ok_to_recieve_this_kind(data) == expected_result
+    assert is_user_ok_to_recieve_this_kind(user_db, data) == expected_result
+
+
+def test_get_user_by_id(prepare_db, save_instance):
+    _ = prepare_db
+    user_db = save_instance(User, {"name": "marco", "email": "asd@asd.com",})
+
+    result = get_user_by_id(user_db.id)
+
+    assert result == user_db
