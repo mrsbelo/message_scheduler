@@ -1,0 +1,409 @@
+openapi: 3.0.0
+info:
+  title: Message_Scheduler_API
+  version: '1.0'
+  description: ''
+  license:
+    name: MIT
+    url: 'https://github.com/mrsbelo/message_scheduler/blob/master/LICENSE'
+servers:
+  - url: 'http://localhost:5000'
+paths:
+  /messages:
+    get:
+      summary: List Messages
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+              examples:
+                example-1:
+                  value:
+                    - created: '2020-08-02T20:46:46Z'
+                      id: 1
+                      kind: sms
+                      scheduled: '2020-12-13T12:12:01Z'
+                      status: scheduled
+                      text: Super message
+                      user_id: 1
+      operationId: get-messages
+    post:
+      summary: Create Message
+      operationId: post-messages
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: validation error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduled:
+                  type: string
+                  format: date-time
+                text:
+                  type: string
+                kind:
+                  type: string
+                  enum:
+                    - email
+                    - sms
+                    - push
+                    - whatsapp
+                status:
+                  type: string
+                  default: scheduled
+                  enum:
+                    - scheduled
+                    - sended
+                user_id:
+                  type: string
+              required:
+                - scheduled
+                - text
+                - kind
+                - user_id
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: ''
+  /healthcheck:
+    get:
+      summary: Health Check
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    status: ok
+      operationId: get-healthcheck
+  '/messages/{message_id}':
+    parameters:
+      - schema:
+          type: string
+        name: message_id
+        in: path
+        required: true
+    get:
+      summary: Get Message
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: Message not found
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: Message not found
+      operationId: get-messages-message_id
+    delete:
+      summary: Delete Message
+      operationId: delete-messages-message_id
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: Message not found
+  /users:
+    get:
+      summary: List Users
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    - email: marco@gmail.com
+                      id: 1
+                      name: marco
+                      phone: '123456789'
+      operationId: get-users
+    post:
+      summary: Create User
+      operationId: post-users
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    email: marco@email.com
+                    id: 4
+                    name: marco
+                    phone: '9934324156'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: validation error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+              required:
+                - name
+  '/users/{user_id}':
+    parameters:
+      - schema:
+          type: string
+        name: user_id
+        in: path
+        required: true
+    get:
+      summary: Get User
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: User not found
+      operationId: get-users-user_id
+    delete:
+      summary: Delete User
+      operationId: delete-users-user_id
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: User not found
+    put:
+      summary: ''
+      operationId: put-users-user_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    email: marco@gmail.com
+                    id: 1
+                    name: marco
+                    phone: '123456789'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    message: User not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+        description: ''
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      x-examples:
+        request-example:
+          name: Marco
+          email: marco@gmail.com
+          phone: '169987432123'
+      description: ''
+      properties:
+        id:
+          type: integer
+          description: User id registered in database
+        name:
+          type: string
+          description: User full name
+        email:
+          type: string
+          description: 'User email, will be used to send: email, push.'
+          format: email
+        phone:
+          type: string
+          description: 'User phone, will be used to send: push, whatsapp.'
+      required:
+        - name
+    Message:
+      title: Message
+      type: object
+      x-examples:
+        request-example:
+          scheduled: '2021-02-01T10:30:00Z'
+          text: Important subject
+          kind: email
+          status: scheduled
+          user_id: 1
+      properties:
+        id:
+          type: string
+          description: Message id registered in database
+        created:
+          type: string
+          description: Datetime string of this request creation (UTC)
+          format: date-time
+        scheduled:
+          type: string
+          description: Datetime string to send this message to the user (UTC)
+          format: date-time
+        text:
+          type: string
+          description: Message to be sended to user
+        kind:
+          type: string
+          enum:
+            - email
+            - sms
+            - push
+            - whatsapp
+        status:
+          type: string
+          enum:
+            - scheduled
+            - sended
+          default: scheduled
+        user_id:
+          type: integer
+          description: User id registered in database
+      required:
+        - scheduled
+        - text
+        - kind
+        - user_id
