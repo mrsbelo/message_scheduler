@@ -12,7 +12,8 @@ paths:
   /messages:
     get:
       summary: List Messages
-      tags: []
+      tags:
+        - messages
       responses:
         '200':
           description: OK
@@ -105,7 +106,6 @@ paths:
   /healthcheck:
     get:
       summary: Health Check
-      tags: []
       responses:
         '200':
           description: OK
@@ -121,6 +121,8 @@ paths:
                   value:
                     status: ok
       operationId: get-healthcheck
+      tags:
+        - utils
   '/messages/{message_id}':
     parameters:
       - schema:
@@ -131,7 +133,8 @@ paths:
         required: true
     get:
       summary: Get Message
-      tags: []
+      tags:
+        - messages
       responses:
         '200':
           description: OK
@@ -188,7 +191,8 @@ paths:
   /users:
     get:
       summary: List Users
-      tags: []
+      tags:
+        - users
       responses:
         '200':
           description: OK
@@ -261,7 +265,8 @@ paths:
         required: true
     get:
       summary: Get User
-      tags: []
+      tags:
+        - users
       responses:
         '200':
           description: OK
@@ -419,3 +424,7 @@ components:
         - text
         - kind
         - user_id
+tags:
+  - name: utils
+  - name: messages
+  - name: users
