@@ -24,7 +24,17 @@ def error_handler(func):
 
         except IntegrityError as exc:
             logger.info("IntegrityError: %s", exc)
-            json_response = {"message": exc.args[0]}
+            message = exc.args[0].strip()
+
+            if "duplicate key value violates unique constraint" in message:
+                message = message.split(
+                    'duplicate key value violates unique constraint "'
+                )[1]
+                message = message.split("_")
+                table, field = message[0], message[1]
+                message = f"There is already a {table} registered with this {field}"
+
+            json_response = {"message": message}
             session.rollback()
 
             return jsonify(json_response), HTTPStatus.BAD_REQUEST.value
