@@ -6,10 +6,12 @@ create_venv:
 	python3.8 -m venv venv
 
 requirements_dev:
-	. venv/bin/activate && pip install -r src/requirements/dev.txt
+	python3.8 -m venv venv
+	. venv/bin/activate && pip3 install -r src/requirements/dev.txt
 
 requirements_prod:
-	. venv/bin/activate && pip install -r src/requirements/prod.txt
+	python3.8 -m venv venv
+	. venv/bin/activate && pip3 install -r src/requirements/prod.txt
 
 run_flask_local:
 	. venv/bin/activate && python3 src/manage.py run -h 0.0.0.0
