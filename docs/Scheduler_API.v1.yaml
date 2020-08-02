@@ -43,6 +43,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
+              examples:
+                example-1: {}
         '400':
           description: Bad Request
           content:
@@ -81,17 +83,25 @@ paths:
                     - scheduled
                     - sended
                 user_id:
-                  type: string
+                  type: integer
               required:
                 - scheduled
                 - text
                 - kind
                 - user_id
+            examples:
+              example-1:
+                value:
+                  scheduled: '2020-12-13T12:12:01Z'
+                  text: message
+                  kind: sms
+                  user_id: 1
           application/xml:
             schema:
               type: object
               properties: {}
         description: ''
+      description: ''
   /healthcheck:
     get:
       summary: Health Check
@@ -114,7 +124,8 @@ paths:
   '/messages/{message_id}':
     parameters:
       - schema:
-          type: string
+          type: integer
+          example: 1
         name: message_id
         in: path
         required: true
@@ -243,7 +254,8 @@ paths:
   '/users/{user_id}':
     parameters:
       - schema:
-          type: string
+          type: integer
+          example: 1
         name: user_id
         in: path
         required: true
