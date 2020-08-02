@@ -26,6 +26,9 @@ Esse make irá executar o build do projeto e também vai iniciar o mesmo, que fi
 
 Endpoints disponíveis:
 
+- http://localhost:5000/healthcheck
+    - [GET] Verificar se o servidor está funcionando
+
 - http://localhost:5000/messages
     - [GET] Listagem de todas as mensagens agendadas
     - [POST] Criação de um novo agendamento de mensagem
@@ -54,12 +57,11 @@ Endpoints disponíveis:
 - **phone**: para as mensagens dos tipos sms e whatsapp
 
 **Message** 
-
 - **created**: gerado automaticamente, registra o momento da criação do agendamento
 - **scheduled**: data e horário do agendamento para que a mensagem seja enviada
 - **text**: a mensagem a ser enviada ao user
-- **kind**: plataforma de envio da mensagem: 0 para email, 1 para sms, 2 para push e 3 para whatsapp
-- **status**: registra se o envio já foi efetuado: 0 para agendada e 1 para enviada
+- **kind**: plataforma de envio da mensagem: 1 para email, 2 para sms, 3 para push e 4 para whatsapp
+- **status**: registra se o envio já foi efetuado: 1 para agendada e 2 para enviada
 - **user_id**: chave estrangeira do alvo da mensagem
 
 ![](docs/db_schema.png)
