@@ -1,12 +1,13 @@
 import pytest
 
-from app import app, db
+from app import app, session
+from app.db import BaseModel, ENGINE
 
 
 def clean_database():
-    db.drop_all()
-    db.create_all()
-    db.session.commit()
+    BaseModel.metadata.drop_all(bind=ENGINE)
+    BaseModel.metadata.create_all(bind=ENGINE)
+    session.commit()
 
 
 @pytest.fixture(name="prepare_db", scope="function")
@@ -17,15 +18,18 @@ def fixture_prepare_db():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     clean_database()
 
-    return db
+    return session
 
 
 @pytest.fixture(name="save_instance", scope="function")
 def fixture_save_instance():
     def _save_instance(model, data):
         data_to_db = model(**data)
-        db.session.add(data_to_db)
-        db.session.commit()
+        session.add(data_to_db)
+        session.flush()
+        session.commit()
+
+        return data_to_db
 
     return _save_instance
 
