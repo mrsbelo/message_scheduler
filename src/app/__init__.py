@@ -78,3 +78,20 @@ def messages():
         logger.info("messages.response: %s", response)
 
         return jsonify(response), HTTPStatus.CREATED.value
+
+
+@app.route("/message/<int:message_id>", methods=["GET"])
+@error_handler
+def message_detail(message_id):
+    if request.method == "GET":
+        logger.info("messages.request: %s", request)
+        logger.info("messages.message_id: %s", message_id)
+        message_db = session.query(Message).get(message_id)
+        if not message_db:
+            response = {"message": "Message not found"}
+            return jsonify(response), HTTPStatus.NOT_FOUND.value
+
+        response = MessageSchema().dump(message_db)
+        logger.info("messages.response: %s", response)
+
+        return jsonify(response), HTTPStatus.OK.value
