@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  tests:
+    docker:
+      - image: circleci/python:3.8.2
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: "install dependencies"
+          command: |
+            make requirements_dev
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "src/app/requirements/dev.txt" }}
+      - run:
+          name: "run tests"
+          command: |
+            . venv/bin/activate
+            make run_tests
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - tests
