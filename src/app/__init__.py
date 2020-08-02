@@ -13,6 +13,7 @@ from .decorators import error_handler
 from .logs import get_logger
 from .models import Message, User
 from .schemas import MessageSchema, UserSchema
+from .views_functions import generic_delete_method
 
 logger = get_logger(__name__)
 app = Flask(__name__)
@@ -92,18 +93,7 @@ def users_detail(user_id):
         return jsonify(response), HTTPStatus.OK.value
 
     elif request.method == "DELETE":
-        logger.info("users.request: %s", request)
-        logger.info("users.user_id: %s", user_id)
-        user_db = session.query(User).get(user_id)
-        if not user_db:
-            response = {"message": "User not found"}
-            return jsonify(response), HTTPStatus.NOT_FOUND.value
-
-        session.delete(user_db)
-        session.commit()
-        logger.info("user.deleted")
-
-        return jsonify({}), HTTPStatus.NO_CONTENT.value
+        return generic_delete_method(user_id, User, request)
 
 
 @app.route("/messages", methods=["GET", "POST"])
@@ -167,18 +157,7 @@ def messages_detail(message_id):
         return jsonify(response), HTTPStatus.OK.value
 
     elif request.method == "DELETE":
-        logger.info("messages.request: %s", request)
-        logger.info("messages.message_id: %s", message_id)
-        message_db = session.query(Message).get(message_id)
-        if not message_db:
-            response = {"message": "Message not found"}
-            return jsonify(response), HTTPStatus.NOT_FOUND.value
-
-        session.delete(message_db)
-        session.commit()
-        logger.info("message.deleted")
-
-        return jsonify({}), HTTPStatus.NO_CONTENT.value
+        return generic_delete_method(message_id, Message, request)
 
 
 @app.route("/", defaults={"path": ""})
