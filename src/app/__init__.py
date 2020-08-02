@@ -2,11 +2,12 @@ from http import HTTPStatus
 
 from flask import Flask, jsonify, request
 
+from .clients import check_if_message_exists
 from .db import session
 from .decorators import error_handler
 from .logs import get_logger
-from .models import BaseModel, Message, User
-from .schemas import UserSchema
+from .models import Message, User
+from .schemas import MessageSchema, UserSchema
 
 logger = get_logger(__name__)
 app = Flask(__name__)
@@ -18,7 +19,8 @@ def hello_world():
     logger.info("healthcheck: Checking database connection")
     session.connection()
     session.close()
-    return jsonify({"status": "ok"})
+
+    return jsonify({"status": "ok"}), HTTPStatus.OK.value
 
 
 @app.route("/users", methods=["GET", "POST"])
@@ -43,5 +45,36 @@ def users():
 
         response = UserSchema().dump(user)
         logger.info("users.response: %s", response)
+
+        return jsonify(response), HTTPStatus.CREATED.value
+
+
+@app.route("/messages", methods=["GET", "POST"])
+@error_handler
+def messages():
+    if request.method == "GET":
+        logger.info("messages.request: %s", request)
+        messages_db = session.query(Message).all()
+        response = MessageSchema().dump(messages_db, many=True)
+        logger.info("messages.response: %s", response)
+
+        return jsonify(response), HTTPStatus.OK.value
+
+    elif request.method == "POST":
+        logger.info("messages.request: %s", request)
+        validated_request = MessageSchema().load(request.json)
+        logger.info("messages.validated_request: %s", validated_request)
+
+        if check_if_message_exists(validated_request):
+            response = {"message": "This message is already registered"}
+
+            return jsonify(response), HTTPStatus.OK.value
+
+        message = Message(**validated_request)
+        session.add(message)
+        session.commit()
+
+        response = MessageSchema().dump(message)
+        logger.info("messages.response: %s", response)
 
         return jsonify(response), HTTPStatus.CREATED.value

@@ -47,7 +47,7 @@ def test_message_empty_data():
 
 def test_message_load_auto_fill_created_with_utc_and_microsecond_zero():
     data = {
-        "scheduled": "2020-08-2T16:12:12Z",
+        "scheduled": "2040-08-2T16:12:12Z",
         "text": "oijwqoid",
         "kind": "email",
         "status": "sended",
@@ -57,7 +57,7 @@ def test_message_load_auto_fill_created_with_utc_and_microsecond_zero():
     expected_result = {
         "created": datetime.utcnow().replace(microsecond=0),
         "kind": 1,
-        "scheduled": datetime(2020, 8, 2, 16, 12, 12),
+        "scheduled": datetime(2040, 8, 2, 16, 12, 12),
         "status": 2,
         "text": "oijwqoid",
         "user_id": 1,
@@ -82,7 +82,7 @@ def test_message_auto_fill_status_field():
 )
 def test_message_status_mapping_str_to_int_on_load(status_input, status_output):
     data = {
-        "scheduled": "2020-08-2T16:12:12Z",
+        "scheduled": "2040-08-2T16:12:12Z",
         "text": "oijwqoid",
         "kind": "email",
         "status": status_input,
@@ -98,7 +98,7 @@ def test_message_status_mapping_str_to_int_on_load(status_input, status_output):
 )
 def test_message_status_mapping_int_to_str_on_dump(status_input, status_output):
     data = {
-        "scheduled": datetime(2020, 8, 2, 16, 12, 12),
+        "scheduled": datetime(2040, 8, 2, 16, 12, 12),
         "text": "oijwqoid",
         "kind": 1,
         "status": status_input,
@@ -114,7 +114,7 @@ def test_message_status_mapping_int_to_str_on_dump(status_input, status_output):
 )
 def test_message_kind_mapping_str_to_int_on_load(kind_input, kind_output):
     data = {
-        "scheduled": "2020-08-2T16:12:12Z",
+        "scheduled": "2040-08-2T16:12:12Z",
         "text": "oijwqoid",
         "kind": kind_input,
         "user_id": 1,
@@ -129,9 +129,10 @@ def test_message_kind_mapping_str_to_int_on_load(kind_input, kind_output):
 )
 def test_message_kind_mapping_int_to_str_on_dump(kind_input, kind_output):
     data = {
-        "scheduled": datetime(2020, 8, 2, 16, 12, 12),
+        "scheduled": datetime(2040, 8, 2, 16, 12, 12),
         "text": "oijwqoid",
         "kind": kind_input,
+        "status": 1,
         "user_id": 1,
     }
     result = MessageSchema().dump(data)
@@ -141,7 +142,7 @@ def test_message_kind_mapping_int_to_str_on_dump(kind_input, kind_output):
 
 def test_message_options_fields_invalid_options():
     data = {
-        "scheduled": "2020-08-2T16:12:12Z",
+        "scheduled": "2040-08-2T16:12:12Z",
         "text": "oijwqoid",
         "kind": "xxxx",
         "status": "xxxx",

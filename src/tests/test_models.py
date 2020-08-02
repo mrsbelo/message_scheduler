@@ -55,14 +55,14 @@ def test_user_empty_data(prepare_db, save_instance):
 
 def test_message_create(prepare_db, save_instance):
     db = prepare_db
-    user = save_instance(
+    _ = save_instance(
         User, {"name": "marco", "email": "asd@asd.com", "phone": "1234567"}
     )
     data = {
         "scheduled": datetime.utcnow().replace(microsecond=0) + timedelta(days=2),
         "text": "wake up",
         "kind": 1,
-        "status": 0,
+        "status": 1,
         "user_id": 1,
     }
     message = save_instance(Message, data)
@@ -80,10 +80,10 @@ def test_delete_a_user_message_should_delete_on_cascade(prepare_db, save_instanc
         "scheduled": datetime.utcnow().replace(microsecond=0) + timedelta(days=2),
         "text": "wake up",
         "kind": 1,
-        "status": 0,
+        "status": 1,
         "user_id": user.id,
     }
-    message = save_instance(Message, data)
+    _ = save_instance(Message, data)
     db.delete(user)
     db.commit()
     result = db.query(Message).all()
