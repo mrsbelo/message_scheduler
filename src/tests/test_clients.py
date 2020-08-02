@@ -90,7 +90,7 @@ def test_is_user_ok_to_recieve_this_kind_user_missing_email(
     "kind, expected_result",
     [("email", True), ("sms", False), ("push", True), ("whatsapp", False)],
 )
-def test_is_user_ok_to_recieve_this_kind_user_missing_email(
+def test_is_user_ok_to_recieve_this_kind_user_missing_phone(
     prepare_db, save_instance, kind, expected_result
 ):
     _ = prepare_db
