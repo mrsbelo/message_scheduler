@@ -27,6 +27,7 @@ def users():
         logger.info("users.request: %s", request)
         users_db = db.session.query(User).all()
         response = UserSchema().dump(users_db, many=True)
+        logger.info("users.response: %s", response)
 
         return jsonify(response), HTTPStatus.OK.value
 

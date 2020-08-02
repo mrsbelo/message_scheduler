@@ -15,7 +15,7 @@ def error_handler(func):
             return func(**kwargs)
         except ValidationError as exc:
             logger.info("ValidationError: %s", exc)
-            json_response = json.dumps(exc.messages)
+            json_response = exc.messages
 
             return jsonify(json_response), HTTPStatus.BAD_REQUEST.value
 

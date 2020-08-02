@@ -12,6 +12,7 @@ class BaseSchema(Schema):
 
 class UserSchema(BaseSchema):
     class Meta:
+        unknown = EXCLUDE
         include = {"id": Integer(dump_only=True)}
 
     name = String(required=True)
