@@ -1,7 +1,8 @@
 from datetime import timedelta
 
+from .constants import KIND_MAP
 from .db import session
-from .models import Message
+from .models import Message, User
 
 
 def check_if_message_exists(data):
@@ -16,3 +17,16 @@ def check_if_message_exists(data):
         )
         .all()
     )
+
+
+def is_user_ok_to_recieve_this_kind(data):
+    user_db = session.query(User).get(data["user_id"])
+
+    if data["kind"] in [KIND_MAP["email"], KIND_MAP["push"]]:
+        if not user_db.email:
+            return False
+    elif data["kind"] in [KIND_MAP["sms"], KIND_MAP["whatsapp"]]:
+        if not user_db.phone:
+            return False
+
+    return True

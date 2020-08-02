@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from flask import Flask, jsonify, request
 
-from .clients import check_if_message_exists
+from .clients import check_if_message_exists, is_user_ok_to_recieve_this_kind
 from .db import session
 from .decorators import error_handler
 from .logs import get_logger
@@ -49,6 +49,57 @@ def users():
         return jsonify(response), HTTPStatus.CREATED.value
 
 
+@app.route("/users/<int:user_id>", methods=["GET", "DELETE", "PUT"])
+@error_handler
+def users_detail(user_id):
+    if request.method == "GET":
+        logger.info("users.request: %s", request)
+        logger.info("users.user_id: %s", user_id)
+        user_db = session.query(User).get(user_id)
+        if not user_db:
+            response = {"message": "User not found"}
+            return jsonify(response), HTTPStatus.NOT_FOUND.value
+
+        response = UserSchema().dump(user_db)
+        logger.info("users.response: %s", response)
+
+        return jsonify(response), HTTPStatus.OK.value
+
+    elif request.method == "PUT":
+        logger.info("users.request: %s", request)
+        logger.info("users.user_id: %s", user_id)
+        user_db = session.query(User).get(user_id)
+        if not user_db:
+            response = {"message": "User not found"}
+            return jsonify(response), HTTPStatus.NOT_FOUND.value
+
+        validated_request = UserSchema().load(request.json)
+        for key, value in validated_request.items():
+            setattr(user_db, key, value)
+
+        session.add(user_db)
+        session.commit()
+
+        response = UserSchema().dump(user_db)
+        logger.info("users.response: %s", response)
+
+        return jsonify(response), HTTPStatus.OK.value
+
+    elif request.method == "DELETE":
+        logger.info("users.request: %s", request)
+        logger.info("users.user_id: %s", user_id)
+        user_db = session.query(User).get(user_id)
+        if not user_db:
+            response = {"message": "User not found"}
+            return jsonify(response), HTTPStatus.NOT_FOUND.value
+
+        session.delete(user_db)
+        session.commit()
+        logger.info("user.deleted")
+
+        return jsonify({}), HTTPStatus.NO_CONTENT.value
+
+
 @app.route("/messages", methods=["GET", "POST"])
 @error_handler
 def messages():
@@ -70,6 +121,13 @@ def messages():
 
             return jsonify(response), HTTPStatus.OK.value
 
+        if not is_user_ok_to_recieve_this_kind(validated_request):
+            response = {
+                "message": "User cant recieve this message, user register is incomplete"
+            }
+
+            return jsonify(response), HTTPStatus.OK.value
+
         message = Message(**validated_request)
         session.add(message)
         session.commit()
@@ -82,7 +140,7 @@ def messages():
 
 @app.route("/messages/<int:message_id>", methods=["GET", "DELETE"])
 @error_handler
-def message_detail(message_id):
+def messages_detail(message_id):
     if request.method == "GET":
         logger.info("messages.request: %s", request)
         logger.info("messages.message_id: %s", message_id)
