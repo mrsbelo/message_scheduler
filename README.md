@@ -29,22 +29,67 @@ Endpoints disponíveis:
 - http://localhost:5000/healthcheck
     - [GET] Verificar se o servidor está funcionando
 
+        ```shell
+        $ curl --request GET http://localhost:5000/healthcheck
+        ```
+
 - http://localhost:5000/messages
     - [GET] Listagem de todas as mensagens agendadas
+
+        ```shell
+        $ curl --request GET http://localhost:5000/messages
+        ```
+
     - [POST] Criação de um novo agendamento de mensagem
+
+        ```shell
+        $ curl --header "Content-Type: application/json" --request POST --data '{"scheduled": "2021-12-13T12:12:01Z", "text": "Important Message", "kind": "sms", "status": "scheduled", "user_id":1}' http://localhost:5000/messages
+        ```
 
 - http://localhost:5000/messages/{message_id}
     - [GET] Detalhes de uma mensagem agendada
+
+        ```shell
+        $ curl --request GET http://localhost:5000/messages/1
+        ```
+
     - [DELETE] Remoção de um agendamento de mensagem
+
+        ```shell
+        $ curl --request DELETE http://localhost:5000/messages/1
+        ```
 
 - http://localhost:5000/users
     - [GET] Listagem de todos os usuários cadastrados
+
+        ```shell
+        $ curl --request GET http://localhost:5000/users
+        ```
+
     - [POST] Criação de um novo usuário
+
+        ```shell
+        $ curl --header "Content-Type: application/json" --request POST --data '{"name": "marco", "email":"marco@gmail.com", "phone":"9943212341"}' http://localhost:5000/users
+        ```
 
 - http://localhost:5000/users/{user_id}
     - [GET] Detalhes de um usuário
+
+        ```shell
+        $ curl --request GET http://localhost:5000/users/1
+        ```
+
     - [PUT] Atualização do cadastro de um usuário
+
+        ```shell
+        $ curl --header "Content-Type: application/json" --request PUT --data '{"name": "marco", "email":"marco@gmail.com", "phone":"9943212341"}' http://localhost:5000/users/1
+        ```
+
     - [DELETE] Remoção de um usuário
+
+        ```shell
+        $ curl --request DELETE http://localhost:5000/users/1
+        ```
 
 ---
 
