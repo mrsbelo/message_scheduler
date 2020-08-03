@@ -3,20 +3,18 @@ from http import HTTPStatus
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from .clients import (
-    check_if_message_exists,
-    get_user_by_id,
-    is_user_ok_to_recieve_this_kind,
-)
 from .db import session
 from .decorators import error_handler
 from .logs import get_logger
 from .models import Message, User
 from .schemas import MessageSchema, UserSchema
 from .views_functions import (
+    add_a_message_schedule,
+    add_a_user,
     generic_delete_method,
     generic_get_detail_method,
     generic_get_list_method,
+    update_a_user,
 )
 
 logger = get_logger(__name__)
@@ -41,18 +39,7 @@ def users():
         return generic_get_list_method(User, request, UserSchema)
 
     elif request.method == "POST":
-        logger.info("users.request: %s", request)
-        validated_request = UserSchema().load(request.json)
-        logger.info("users.validated_request: %s", validated_request)
-
-        user = User(**validated_request)
-        session.add(user)
-        session.commit()
-
-        response = UserSchema().dump(user)
-        logger.info("users.response: %s", response)
-
-        return jsonify(response), HTTPStatus.CREATED.value
+        return add_a_user(request)
 
 
 @app.route("/users/<int:user_id>", methods=["GET", "DELETE", "PUT"])
@@ -62,24 +49,7 @@ def users_detail(user_id):
         return generic_get_detail_method(user_id, User, request, UserSchema)
 
     elif request.method == "PUT":
-        logger.info("users.request: %s", request)
-        logger.info("users.user_id: %s", user_id)
-        user_db = session.query(User).get(user_id)
-        if not user_db:
-            response = {"message": "User not found"}
-            return jsonify(response), HTTPStatus.NOT_FOUND.value
-
-        validated_request = UserSchema().load(request.json)
-        for key, value in validated_request.items():
-            setattr(user_db, key, value)
-
-        session.add(user_db)
-        session.commit()
-
-        response = UserSchema().dump(user_db)
-        logger.info("users.response: %s", response)
-
-        return jsonify(response), HTTPStatus.OK.value
+        return update_a_user(request, user_id)
 
     elif request.method == "DELETE":
         return generic_delete_method(user_id, User, request)
@@ -92,36 +62,7 @@ def messages():
         return generic_get_list_method(Message, request, MessageSchema)
 
     elif request.method == "POST":
-        logger.info("messages.request: %s", request)
-        validated_request = MessageSchema().load(request.json)
-        logger.info("messages.validated_request: %s", validated_request)
-
-        if check_if_message_exists(validated_request):
-            response = {"message": "This message is already registered"}
-
-            return jsonify(response), HTTPStatus.OK.value
-
-        user_db = get_user_by_id(validated_request["user_id"])
-        if not user_db:
-            response = {"message": "user_id not found"}
-
-            return jsonify(response), HTTPStatus.BAD_REQUEST.value
-
-        if not is_user_ok_to_recieve_this_kind(user_db, validated_request):
-            response = {
-                "message": "User cant recieve this message, user register is incomplete"
-            }
-
-            return jsonify(response), HTTPStatus.OK.value
-
-        message = Message(**validated_request)
-        session.add(message)
-        session.commit()
-
-        response = MessageSchema().dump(message)
-        logger.info("messages.response: %s", response)
-
-        return jsonify(response), HTTPStatus.CREATED.value
+        return add_a_message_schedule(request)
 
 
 @app.route("/messages/<int:message_id>", methods=["GET", "DELETE"])
