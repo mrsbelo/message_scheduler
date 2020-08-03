@@ -35,3 +35,12 @@ def generic_get_detail_method(instance_id, model, request, schema):
     logger.info("response: %s", response)
 
     return jsonify(response), HTTPStatus.OK.value
+
+
+def generic_get_list_method(model, request, schema):
+    logger.info("request: %s", request)
+    instances_db = session.query(model).all()
+    response = schema().dump(instances_db, many=True)
+    logger.info("response: %s", response)
+
+    return jsonify(response), HTTPStatus.OK.value

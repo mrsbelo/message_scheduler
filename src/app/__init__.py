@@ -13,7 +13,11 @@ from .decorators import error_handler
 from .logs import get_logger
 from .models import Message, User
 from .schemas import MessageSchema, UserSchema
-from .views_functions import generic_delete_method, generic_get_detail_method
+from .views_functions import (
+    generic_delete_method,
+    generic_get_detail_method,
+    generic_get_list_method,
+)
 
 logger = get_logger(__name__)
 app = Flask(__name__)
@@ -34,12 +38,7 @@ def hello_world():
 @error_handler
 def users():
     if request.method == "GET":
-        logger.info("users.request: %s", request)
-        users_db = session.query(User).all()
-        response = UserSchema().dump(users_db, many=True)
-        logger.info("users.response: %s", response)
-
-        return jsonify(response), HTTPStatus.OK.value
+        return generic_get_list_method(User, request, UserSchema)
 
     elif request.method == "POST":
         logger.info("users.request: %s", request)
@@ -90,12 +89,7 @@ def users_detail(user_id):
 @error_handler
 def messages():
     if request.method == "GET":
-        logger.info("messages.request: %s", request)
-        messages_db = session.query(Message).all()
-        response = MessageSchema().dump(messages_db, many=True)
-        logger.info("messages.response: %s", response)
-
-        return jsonify(response), HTTPStatus.OK.value
+        return generic_get_list_method(Message, request, MessageSchema)
 
     elif request.method == "POST":
         logger.info("messages.request: %s", request)
